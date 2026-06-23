@@ -1,15 +1,14 @@
-"""Раздел 1. Загрузка данных из файлов, SQL-баз и REST API."""
+"""Раздел «Источники данных»: загрузка из файлов, SQL-баз и REST API."""
 from __future__ import annotations
 
 import streamlit as st
 
 from core import data_sources as ds
-from core import storage
+from core import storage, ui
 
-st.set_page_config(page_title="Загрузка данных", page_icon="📥", layout="wide")
+ui.app_header()
+ui.breadcrumb("Главная", "Источники данных")
 storage.ensure_dirs()
-
-st.title("📥 Загрузка данных")
 
 tab_file, tab_sql, tab_api, tab_manage = st.tabs(
     ["📄 Файл", "🗄️ SQL-база", "🌐 REST API / URL", "🗂️ Мои датасеты"]
@@ -47,7 +46,7 @@ with tab_file:
 
         df = st.session_state.get("_loaded_df")
         if df is not None:
-            st.dataframe(df.head(50), use_container_width=True)
+            st.dataframe(df.head(50), width="stretch")
             st.caption(f"{len(df)} строк × {df.shape[1]} столбцов")
             default_name = uploaded.name.rsplit(".", 1)[0]
             dname = st.text_input("Имя датасета", value=default_name, key="fname")
@@ -86,7 +85,7 @@ with tab_sql:
 
     df = st.session_state.get("_sql_df")
     if df is not None:
-        st.dataframe(df.head(50), use_container_width=True)
+        st.dataframe(df.head(50), width="stretch")
         st.caption(f"{len(df)} строк × {df.shape[1]} столбцов")
         dname = st.text_input("Имя датасета", value="sql_result", key="sqlname")
         if st.button("💾 Сохранить датасет", key="save_sql", type="primary"):
@@ -98,7 +97,8 @@ with tab_sql:
 # API
 # --------------------------------------------------------------------------- #
 with tab_api:
-    url = st.text_input("URL", key="api_url", placeholder="https://api.example.com/data")
+    url = st.text_input("URL", key="api_url",
+                        placeholder="https://api.example.com/data")
     cc = st.columns(2)
     fmt = cc[0].selectbox("Формат", ["auto", "json", "csv"], key="api_fmt")
     json_path = cc[1].text_input("Путь к списку в JSON (через точку)",
@@ -120,7 +120,7 @@ with tab_api:
 
     df = st.session_state.get("_api_df")
     if df is not None:
-        st.dataframe(df.head(50), use_container_width=True)
+        st.dataframe(df.head(50), width="stretch")
         st.caption(f"{len(df)} строк × {df.shape[1]} столбцов")
         dname = st.text_input("Имя датасета", value="api_result", key="apiname")
         if st.button("💾 Сохранить датасет", key="save_api", type="primary"):
@@ -139,7 +139,8 @@ with tab_manage:
         with st.expander(f"**{name}** — {info['rows']} × {info['cols']} "
                          f"({info['source']}, {info['updated']})"):
             st.write("Столбцы:", ", ".join(info["columns"]))
-            st.dataframe(storage.load_dataset(name).head(20), use_container_width=True)
+            st.dataframe(storage.load_dataset(name).head(20),
+                         width="stretch")
             d1, d2 = st.columns([3, 1])
             new_name = d1.text_input("Переименовать", value=name, key=f"rn_{name}")
             if d1.button("Переименовать", key=f"rnbtn_{name}"):

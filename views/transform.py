@@ -1,19 +1,18 @@
-"""Раздел 2. Обработка данных — построение пайплайна преобразований."""
+"""Раздел «Обработка данных» — построение пайплайна преобразований."""
 from __future__ import annotations
 
 import streamlit as st
 
-from core import storage
+from core import storage, ui
 from core import transforms as tf
 
-st.set_page_config(page_title="Обработка данных", page_icon="🔧", layout="wide")
+ui.app_header()
+ui.breadcrumb("Главная", "Обработка данных")
 storage.ensure_dirs()
-
-st.title("🔧 Обработка данных")
 
 datasets = storage.list_datasets()
 if not datasets:
-    st.info("Сначала загрузите данные в разделе **📥 Загрузка данных**.")
+    st.info("Сначала загрузите данные в разделе **Источники данных**.")
     st.stop()
 
 source = st.selectbox("Исходный датасет", list(datasets))
@@ -83,11 +82,13 @@ with left:
             step = {"op": "rename", "mapping": {col: new}}
 
     elif op == "select":
-        cols = st.multiselect("Оставить столбцы", columns, default=columns, key="s_cols")
+        cols = st.multiselect("Оставить столбцы", columns, default=columns,
+                              key="s_cols")
         step = {"op": "select", "columns": cols}
 
     elif op == "dropna":
-        cols = st.multiselect("Учитывать столбцы (пусто = все)", columns, key="dn_cols")
+        cols = st.multiselect("Учитывать столбцы (пусто = все)", columns,
+                              key="dn_cols")
         step = {"op": "dropna", "columns": cols}
 
     elif op == "fillna":
@@ -113,7 +114,8 @@ with left:
         by = st.multiselect("Группировать по", columns, key="g_by")
         agg_cols = st.multiselect("Агрегировать столбцы",
                                   [c for c in columns if c not in by], key="g_cols")
-        funcs = st.multiselect("Функции", tf.AGG_FUNCS, default=["sum"], key="g_funcs")
+        funcs = st.multiselect("Функции", tf.AGG_FUNCS, default=["sum"],
+                               key="g_funcs")
         if by and agg_cols and funcs:
             step = {"op": "groupby", "by": by,
                     "aggregations": {c: funcs for c in agg_cols}}
@@ -158,11 +160,12 @@ if pipe_error:
     st.error(f"Ошибка в пайплайне: {pipe_error}")
 else:
     st.subheader("Результат")
-    st.dataframe(current_df.head(100), use_container_width=True)
+    st.dataframe(current_df.head(100), width="stretch")
     st.caption(f"{len(current_df)} строк × {current_df.shape[1]} столбцов")
 
     cc = st.columns([3, 1])
-    out_name = cc[0].text_input("Сохранить результат как", value=f"{source}_обработан")
+    out_name = cc[0].text_input("Сохранить результат как",
+                                value=f"{source}_обработан")
     if cc[1].button("💾 Сохранить", type="primary", disabled=bool(pipe_error)):
         storage.save_dataset(out_name, current_df, source="transform",
                              meta={"from": source, "pipeline": pipeline})
