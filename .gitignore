@@ -1,0 +1,24 @@
+# Рабочие данные приложения (датасеты/виджеты/дашборды пользователя)
+workspace/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Виртуальные окружения
+.venv/
+venv/
+env/
+
+# Streamlit (секреты и кэш)
+.streamlit/secrets.toml
+
+# IDE / ОС
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
