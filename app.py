@@ -4,9 +4,15 @@
 """
 from __future__ import annotations
 
+from pathlib import Path
+
+import pandas as pd
 import streamlit as st
 
 from core import storage
+
+DEMO_CSV = Path(__file__).resolve().parent / "sample_data" / "sales_demo.csv"
+DEMO_NAME = "Демо: продажи 2025"
 
 st.set_page_config(page_title="Визуализация данных", page_icon="📊", layout="wide")
 
@@ -25,6 +31,28 @@ c2.metric("Виджеты", len(widgets))
 c3.metric("Дашборды", len(dashboards))
 
 st.divider()
+
+# --------------------------------------------------------------------------- #
+# Демо-датасет
+# --------------------------------------------------------------------------- #
+if DEMO_CSV.exists():
+    st.subheader("🎬 Демо-данные")
+    cols = st.columns([3, 1])
+    cols[0].caption(
+        "Загрузите готовый датасет продаж за 2025 год (регионы, категории, "
+        "каналы, продажи и прибыль) — чтобы сразу опробовать все 4 раздела."
+    )
+    already = DEMO_NAME in datasets
+    if cols[1].button("📥 Загрузить демо" if not already else "🔄 Перезагрузить демо"):
+        demo_df = pd.read_csv(DEMO_CSV)
+        storage.save_dataset(DEMO_NAME, demo_df, source="demo",
+                             meta={"file": DEMO_CSV.name})
+        st.success(f"Датасет «{DEMO_NAME}» загружен ({len(demo_df)} строк). "
+                   "Откройте раздел 🔧 Обработка или 📊 Виджеты.")
+    if already:
+        cols[0].caption(f"✅ Датасет «{DEMO_NAME}» уже загружен.")
+
+    st.divider()
 
 st.markdown(
     """
