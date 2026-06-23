@@ -17,8 +17,12 @@ if not datasets:
     st.stop()
 
 
-def render_widget(cfg: dict, df) -> None:
-    """Рисует виджет по конфигурации внутри текущего контейнера."""
+def render_widget(cfg: dict, df, *, key: str) -> None:
+    """Рисует виджет по конфигурации внутри текущего контейнера.
+
+    ``key`` — уникальный префикс, чтобы у одинаковых графиков не совпадали
+    авто-сгенерированные ID Streamlit.
+    """
     try:
         kind, payload = charts.build_figure(df, cfg)
     except Exception as e:  # noqa: BLE001
@@ -27,9 +31,9 @@ def render_widget(cfg: dict, df) -> None:
     if kind == "metric":
         st.metric(cfg.get("title") or cfg.get("name", ""), payload)
     elif kind == "table":
-        st.dataframe(payload, use_container_width=True)
+        st.dataframe(payload, use_container_width=True, key=f"tbl_{key}")
     else:
-        st.plotly_chart(payload, use_container_width=True)
+        st.plotly_chart(payload, use_container_width=True, key=f"chart_{key}")
 
 
 tab_new, tab_list = st.tabs(["➕ Создать виджет", "🗂️ Мои виджеты"])
@@ -98,7 +102,7 @@ with tab_new:
 
     st.divider()
     st.subheader("Предпросмотр")
-    render_widget(cfg, df)
+    render_widget(cfg, df, key="preview")
 
     if st.button("💾 Сохранить виджет", type="primary"):
         saved = storage.save_widget(cfg)
@@ -117,7 +121,7 @@ with tab_list:
             st.markdown(f"**{w['name']}** · {charts.CHART_TYPES.get(w['chart_type'], w['chart_type'])} "
                         f"· датасет: `{w['dataset']}`")
             if w["dataset"] in datasets:
-                render_widget(w, storage.load_dataset(w["dataset"]))
+                render_widget(w, storage.load_dataset(w["dataset"]), key=w["id"])
             else:
                 st.warning("Датасет виджета удалён.")
             a, b = st.columns(2)

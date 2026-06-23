@@ -29,7 +29,7 @@ def render_widget(cfg: dict) -> None:
     if kind == "metric":
         st.metric(cfg.get("title") or cfg["name"], payload)
     elif kind == "table":
-        st.dataframe(payload, use_container_width=True)
+        st.dataframe(payload, use_container_width=True, key=f"dash_tbl_{cfg['id']}")
     else:
         st.plotly_chart(payload, use_container_width=True, key=f"dash_{cfg['id']}")
 
