@@ -12,11 +12,14 @@ APP_NAME = "Представление данных"
 APP_SUBTITLE = "Аналитическая платформа · визуализация данных"
 PRIMARY = "#2E6CB5"
 
-_CSS = f"""
+# Доступные режимы оформления приложения и соответствующий шаблон Plotly.
+APPEARANCES = {"Светлая": "plotly_white", "Тёмная": "plotly_dark"}
+
+_BASE_CSS = f"""
 <style>
 :root {{ --primary: {PRIMARY}; }}
 
-/* Шапка приложения */
+/* Шапка приложения (одинакова в обоих режимах) */
 .app-header {{
     background: linear-gradient(90deg, {PRIMARY} 0%, #244e88 100%);
     color: #fff;
@@ -29,9 +32,7 @@ _CSS = f"""
 .app-header .subtitle {{ font-size: 12.5px; opacity:.85; margin-top:2px; }}
 
 /* Хлебные крошки */
-.crumbs {{
-    color: #6b7a90; font-size: 12.5px; margin: 4px 0 14px 2px;
-}}
+.crumbs {{ font-size: 12.5px; margin: 4px 0 14px 2px; }}
 .crumbs b {{ color: var(--primary); }}
 
 /* Бейдж уровня доступа */
@@ -42,22 +43,66 @@ _CSS = f"""
 .badge-common {{ background:#E3F0FF; color:#1c5aa8; }}
 .badge-private {{ background:#FCE8E6; color:#b3261e; }}
 
-/* Карточки виджетов */
 [data-testid="stVerticalBlockBorderWrapper"] {{ border-radius:10px; }}
-
-/* Первичные кнопки */
 .stButton button[kind="primary"] {{
     background: var(--primary); border:0; font-weight:600;
 }}
+</style>
+"""
 
-/* Заголовки секций */
-h2, h3 {{ color:#1B2A41; }}
+# Светлый режим: мягкий фон, тёмный текст крошек/заголовков.
+_LIGHT_CSS = """
+<style>
+.crumbs { color:#6b7a90; }
+h2, h3 { color:#1B2A41; }
+</style>
+"""
+
+# Тёмный режим: переопределяем фон/текст основных контейнеров Streamlit.
+_DARK_CSS = """
+<style>
+.stApp { background-color:#0E1117; }
+[data-testid="stHeader"] { background:rgba(0,0,0,0); }
+section[data-testid="stSidebar"] { background-color:#161922; }
+
+.stApp, .stMarkdown, p, li, label, span, small,
+h1, h2, h3, h4, h5, h6,
+[data-testid="stMetricValue"], [data-testid="stMetricLabel"],
+[data-testid="stWidgetLabel"] p { color:#E6E9EF !important; }
+
+.crumbs { color:#9aa7bd !important; }
+
+/* Поля ввода и селекторы */
+.stTextInput input, .stNumberInput input, .stTextArea textarea,
+[data-baseweb="select"] > div, [data-baseweb="input"] > div {
+    background-color:#1E222B !important; color:#E6E9EF !important;
+}
+/* Карточки/границы и таблицы */
+[data-testid="stVerticalBlockBorderWrapper"] { border-color:#2A2F3A !important; }
+[data-testid="stDataFrame"] { background-color:#1A1D24; }
+/* Вкладки */
+.stTabs [data-baseweb="tab"] { color:#cdd5e3; }
 </style>
 """
 
 
+def appearance() -> str:
+    """Текущий режим оформления приложения (Светлая/Тёмная)."""
+    return st.session_state.get("appearance", "Светлая")
+
+
+def appearance_control() -> None:
+    """Переключатель оформления в боковом меню. Вызывать до inject_css()."""
+    with st.sidebar:
+        st.radio("🎨 Оформление", list(APPEARANCES), key="appearance",
+                 horizontal=True)
+
+
 def inject_css() -> None:
-    st.markdown(_CSS, unsafe_allow_html=True)
+    st.markdown(_BASE_CSS, unsafe_allow_html=True)
+    mode = appearance()
+    st.markdown(_DARK_CSS if mode == "Тёмная" else _LIGHT_CSS,
+                unsafe_allow_html=True)
 
 
 def app_header() -> None:

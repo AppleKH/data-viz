@@ -14,6 +14,7 @@ from core import storage, ui
 st.set_page_config(page_title="Представление данных", page_icon="📊",
                    layout="wide")
 storage.ensure_dirs()
+ui.appearance_control()  # переключатель Светлая/Тёмная — до применения CSS
 ui.inject_css()
 
 home = st.Page("views/home.py", title="Главная", icon=":material/home:",

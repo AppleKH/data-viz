@@ -39,10 +39,10 @@ with tab_new:
                           index=0 if not editing else
                           (0 if editing.get("access", "Общий") == "Общий" else 1))
 
+    theme_default = (editing.get("theme") if editing and
+                     editing.get("theme") in charts.THEMES else ui.appearance())
     theme_name = st.selectbox("Тема оформления", list(charts.THEMES),
-                              index=list(charts.THEMES).index(
-                                  editing.get("theme", "Светлая"))
-                              if editing and editing.get("theme") in charts.THEMES else 0)
+                              index=list(charts.THEMES).index(theme_default))
 
     cfg: dict = {
         "id": editing["id"] if editing else "",

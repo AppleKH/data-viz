@@ -36,7 +36,7 @@ with tab_edit:
 
     if choice == "➕ Новый дашборд":
         current = {"id": "", "name": "Новый дашборд", "widgets": [],
-                   "columns": 2, "access": "Общий", "theme": "Светлая"}
+                   "columns": 2, "access": "Общий", "theme": ui.appearance()}
     else:
         current = next(d for d in dashboards if d["name"] == choice)
 
