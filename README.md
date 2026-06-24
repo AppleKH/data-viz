@@ -7,9 +7,9 @@
 
 ## 🌐 Онлайн-демо
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://data-viz.streamlit.app)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://applekh-data-viz.streamlit.app)
 
-Постоянная ссылка: **https://data-viz.streamlit.app**
+Постоянная ссылка: **https://applekh-data-viz.streamlit.app**
 
 > Приложение развёрнуто в [Streamlit Community Cloud](https://share.streamlit.io)
 > и автоматически обновляется при каждом `git push` в ветку `main`.
@@ -53,8 +53,8 @@ python -m streamlit run app.py
    - **Repository**: `AppleKH/data-viz`
    - **Branch**: `main`
    - **Main file path**: `app.py`
-   - **App URL (Advanced settings)**: задайте поддомен `data-viz`
-     → итоговый адрес `https://data-viz.streamlit.app`
+   - **App URL (Advanced settings)**: задайте поддомен `applekh-data-viz`
+     → итоговый адрес `https://applekh-data-viz.streamlit.app`
 4. Нажмите **Deploy**. Через 1–2 минуты приложение будет доступно по ссылке.
 
 После деплоя любой `git push` в `main` автоматически обновляет онлайн-версию.
