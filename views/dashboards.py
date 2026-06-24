@@ -14,14 +14,13 @@ widget_by_id = {w["id"]: w for w in widgets}
 datasets = storage.list_datasets()
 
 
-def render_on_dashboard(cfg: dict, theme: str) -> None:
+def render_on_dashboard(cfg: dict) -> None:
     df = (storage.load_dataset(cfg["dataset"])
           if cfg.get("dataset") in datasets else None)
     if cfg["chart_type"] not in charts.STATIC_TYPES and df is None:
         st.warning(f"«{cfg['name']}»: датасет удалён")
         return
-    # Тема дашборда переопределяет тему виджета.
-    ui.render_widget({**cfg, "theme": theme}, df, key=f"dash_{cfg['id']}")
+    ui.render_widget(cfg, df, key=f"dash_{cfg['id']}")
 
 
 tab_view, tab_edit = st.tabs(["👁️ Просмотр", "🛠️ Добавление дашборда"])
@@ -36,17 +35,14 @@ with tab_edit:
 
     if choice == "➕ Новый дашборд":
         current = {"id": "", "name": "Новый дашборд", "widgets": [],
-                   "columns": 2, "access": "Общий", "theme": ui.appearance()}
+                   "columns": 2, "access": "Общий"}
     else:
         current = next(d for d in dashboards if d["name"] == choice)
 
-    c1, c2, c3 = st.columns([2, 1, 1])
+    c1, c2 = st.columns([3, 1])
     name = c1.text_input("Название дашборда *", value=current["name"])
     access = c2.selectbox("Уровень доступа", ["Общий", "Личный"],
                           index=0 if current.get("access", "Общий") == "Общий" else 1)
-    theme = c3.selectbox("Тема оформления", list(charts.THEMES),
-                         index=list(charts.THEMES).index(current.get("theme", "Светлая"))
-                         if current.get("theme") in charts.THEMES else 0)
     ncols = st.slider("Столбцов в сетке", 1, 4, current.get("columns", 2))
 
     if not widgets:
@@ -62,7 +58,7 @@ with tab_edit:
         b1, b2 = st.columns(2)
         if b1.button("✅ Сохранить дашборд", type="primary"):
             current.update(name=name, columns=ncols, widgets=chosen,
-                           access=access, theme=theme)
+                           access=access)
             storage.save_dashboard(current)
             st.success(f"Дашборд «{name}» сохранён.")
             st.rerun()
@@ -88,10 +84,9 @@ with tab_view:
         if not wids:
             st.info("На дашборде нет виджетов.")
         else:
-            theme = dash.get("theme", "Светлая")
             ncols = dash.get("columns", 2)
             grid = st.columns(ncols)
             for i, wid in enumerate(wids):
                 with grid[i % ncols]:
                     with st.container(border=True):
-                        render_on_dashboard(widget_by_id[wid], theme)
+                        render_on_dashboard(widget_by_id[wid])

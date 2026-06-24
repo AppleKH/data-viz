@@ -1,8 +1,9 @@
+# Тёмная тема — по умолчанию (нативная тема Streamlit).
+# Светлую можно включить в меню «⋮» → Settings → Appearance —
+# Streamlit корректно перекрасит ВСЕ элементы, включая таблицы.
 [theme]
-primaryColor = "#2E6CB5"
-backgroundColor = "#FFFFFF"
-secondaryBackgroundColor = "#F2F5FA"
-textColor = "#1B2A41"
+base = "dark"
+primaryColor = "#4D9BE0"
 font = "sans serif"
 
 [server]

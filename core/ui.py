@@ -10,18 +10,15 @@ from core import charts
 
 APP_NAME = "Представление данных"
 APP_SUBTITLE = "Аналитическая платформа · визуализация данных"
-PRIMARY = "#2E6CB5"
-
-# Доступные режимы оформления приложения и соответствующий шаблон Plotly.
-APPEARANCES = {"Светлая": "plotly_white", "Тёмная": "plotly_dark"}
+PRIMARY = "#4D9BE0"
 
 _BASE_CSS = f"""
 <style>
 :root {{ --primary: {PRIMARY}; }}
 
-/* Шапка приложения (одинакова в обоих режимах) */
+/* Шапка приложения */
 .app-header {{
-    background: linear-gradient(90deg, {PRIMARY} 0%, #244e88 100%);
+    background: linear-gradient(90deg, #2E6CB5 0%, #244e88 100%);
     color: #fff;
     padding: 14px 22px;
     border-radius: 10px;
@@ -31,8 +28,8 @@ _BASE_CSS = f"""
 .app-header .title {{ font-size: 20px; font-weight: 700; letter-spacing:.2px; }}
 .app-header .subtitle {{ font-size: 12.5px; opacity:.85; margin-top:2px; }}
 
-/* Хлебные крошки */
-.crumbs {{ font-size: 12.5px; margin: 4px 0 14px 2px; }}
+/* Хлебные крошки (нейтральный серый — читаем в обеих темах) */
+.crumbs {{ font-size: 12.5px; margin: 4px 0 14px 2px; color:#8895a7; }}
 .crumbs b {{ color: var(--primary); }}
 
 /* Бейдж уровня доступа */
@@ -50,59 +47,17 @@ _BASE_CSS = f"""
 </style>
 """
 
-# Светлый режим: мягкий фон, тёмный текст крошек/заголовков.
-_LIGHT_CSS = """
-<style>
-.crumbs { color:#6b7a90; }
-h2, h3 { color:#1B2A41; }
-</style>
-"""
 
-# Тёмный режим: переопределяем фон/текст основных контейнеров Streamlit.
-_DARK_CSS = """
-<style>
-.stApp { background-color:#0E1117; }
-[data-testid="stHeader"] { background:rgba(0,0,0,0); }
-section[data-testid="stSidebar"] { background-color:#161922; }
-
-.stApp, .stMarkdown, p, li, label, span, small,
-h1, h2, h3, h4, h5, h6,
-[data-testid="stMetricValue"], [data-testid="stMetricLabel"],
-[data-testid="stWidgetLabel"] p { color:#E6E9EF !important; }
-
-.crumbs { color:#9aa7bd !important; }
-
-/* Поля ввода и селекторы */
-.stTextInput input, .stNumberInput input, .stTextArea textarea,
-[data-baseweb="select"] > div, [data-baseweb="input"] > div {
-    background-color:#1E222B !important; color:#E6E9EF !important;
-}
-/* Карточки/границы и таблицы */
-[data-testid="stVerticalBlockBorderWrapper"] { border-color:#2A2F3A !important; }
-[data-testid="stDataFrame"] { background-color:#1A1D24; }
-/* Вкладки */
-.stTabs [data-baseweb="tab"] { color:#cdd5e3; }
-</style>
-"""
-
-
-def appearance() -> str:
-    """Текущий режим оформления приложения (Светлая/Тёмная)."""
-    return st.session_state.get("appearance", "Светлая")
-
-
-def appearance_control() -> None:
-    """Переключатель оформления в боковом меню. Вызывать до inject_css()."""
-    with st.sidebar:
-        st.radio("🎨 Оформление", list(APPEARANCES), key="appearance",
-                 horizontal=True)
+def active_template() -> str:
+    """Шаблон Plotly под активную тему Streamlit (светлая/тёмная)."""
+    try:
+        return "plotly_dark" if st.context.theme.type == "dark" else "plotly_white"
+    except Exception:  # noqa: BLE001  — на случай старого Streamlit
+        return "plotly_dark"
 
 
 def inject_css() -> None:
     st.markdown(_BASE_CSS, unsafe_allow_html=True)
-    mode = appearance()
-    st.markdown(_DARK_CSS if mode == "Тёмная" else _LIGHT_CSS,
-                unsafe_allow_html=True)
 
 
 def app_header() -> None:
@@ -134,9 +89,10 @@ def render_widget(cfg: dict, df=None, *, key: str) -> None:
     """Отрисовывает виджет любого типа. ``key`` обеспечивает уникальные ID.
 
     ``df`` может быть None для статических виджетов (Html/Изображение/Дата-время).
+    Графики автоматически следуют активной теме приложения (светлая/тёмная).
     """
     try:
-        kind, payload = charts.build_figure(df, cfg)
+        kind, payload = charts.build_figure(df, {**cfg, "_template": active_template()})
     except Exception as e:  # noqa: BLE001
         st.error(f"Ошибка построения виджета: {e}")
         return

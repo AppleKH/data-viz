@@ -84,7 +84,9 @@ def build_figure(df: pd.DataFrame, cfg: dict):
     ('html', str) | ('image', url) | ('datetime', None).
     """
     chart = cfg.get("chart_type", "bar")
-    template = THEMES.get(cfg.get("theme", ""), "plotly_white")
+    # Активная тема приложения (передаётся из ui.render_widget); запасной вариант —
+    # сохранённая тема виджета или светлая.
+    template = cfg.get("_template") or THEMES.get(cfg.get("theme", ""), "plotly_white")
     x = cfg.get("x")
     ys = cfg.get("y") or []
     if isinstance(ys, str):
