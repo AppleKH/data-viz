@@ -18,6 +18,13 @@ c1.metric("Датасеты", len(datasets))
 c2.metric("Виджеты", len(widgets))
 c3.metric("Дашборды", len(dashboards))
 
+if storage.USE_DB:
+    st.caption("💾 Хранилище: **внешняя база данных** — данные сохраняются постоянно.")
+else:
+    st.caption("📁 Хранилище: **локальные файлы** (`workspace/`). В облаке данные "
+               "сбрасываются при перезапуске — задайте `DATABASE_URL` для постоянного "
+               "хранения.")
+
 st.divider()
 
 st.markdown(
