@@ -228,7 +228,9 @@ def _smooth_fill(fig) -> None:
     """Сглаживание (spline) + полупрозрачная заливка под линией — как на референсе."""
     for tr in fig.data:
         base = tr.line.color or COLORWAY[0]
-        tr.update(line_shape="spline", line_width=2.6, mode="lines",
+        tr.update(line_shape="spline", line_width=2.6, mode="lines+markers",
+                  marker=dict(size=8, color=base,
+                              line=dict(width=1.6, color="#17131F")),
                   fill="tozeroy", fillcolor=_rgba(base, 0.16))
 
 
