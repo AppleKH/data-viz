@@ -7,19 +7,14 @@
 """
 from __future__ import annotations
 
-from pathlib import Path
-
 import streamlit as st
 
 from core import storage, ui
 
-_ASSETS = Path(__file__).resolve().parent / "assets"
-
 st.set_page_config(page_title="Datavisor", page_icon="📊", layout="wide")
-st.logo(str(_ASSETS / "logo.svg"), icon_image=str(_ASSETS / "icon.svg"),
-        size="large")
 storage.ensure_dirs()
 ui.inject_css()
+ui.sidebar_logo()  # собственный логотип вверху боковой панели
 
 home = st.Page("views/home.py", title="Главная", icon=":material/home:",
                default=True)

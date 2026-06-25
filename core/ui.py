@@ -62,6 +62,26 @@ _BASE_CSS = f"""
     color: var(--primary) !important;
 }}
 
+/* Логотип должен стоять НАД меню навигации (которое Streamlit ставит вверху) */
+[data-testid="stSidebarContent"] {{
+    display: flex !important;
+    flex-direction: column !important;
+}}
+[data-testid="stSidebarUserContent"] {{ order: -1 !important; }}
+
+/* Собственный логотип вверху боковой панели */
+.dv-logo {{
+    display: flex; align-items: center; gap: 11px;
+    padding: 14px 6px 6px 6px;
+}}
+.dv-logo svg {{ width: 36px; height: 36px; flex: none; }}
+.dv-logo-text {{
+    font-size: 22px; font-weight: 700; letter-spacing: .3px;
+    background: linear-gradient(90deg, #C4B5FD, #F9A8D4);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    white-space: nowrap;
+}}
+
 /* Слайдер/ссылки в акцентном цвете */
 a, .stMarkdown a {{ color: var(--primary); }}
 
@@ -78,10 +98,24 @@ section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarC
 section[data-testid="stSidebar"][aria-expanded="false"] > div {{
     overflow: visible !important;
 }}
+/* Свёрнутый вид: у логотипа прячем текст, иконку центрируем в полосе */
+section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo {{
+    justify-content: center !important;
+    padding: 14px 0 8px 0 !important;
+}}
+section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo-text {{
+    display: none !important;
+}}
+section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo svg {{
+    width: 28px !important; height: 28px !important;
+}}
+/* Убираем стрелку «свернуть» под лого в свёрнутой панели */
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarCollapseButton"] {{
+    display: none !important;
+}}
 /* Прячем подписи ссылок и заголовки групп — оставляем только иконки */
 section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNavLink"] > span:last-child,
-section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNav"] header,
-section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarUserContent"] {{
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNav"] header {{
     display: none !important;
 }}
 /* Заголовки групп (Навигация/Данные/Панели) — пункты списка без ссылки */
@@ -126,6 +160,33 @@ def inject_css() -> None:
     # Тёмно-фиолетовый фон задаётся темой в config.toml (нативно).
     # Здесь — только фирменные акценты (шапка, KPI, меню, рамки карточек).
     st.markdown(_BASE_CSS, unsafe_allow_html=True)
+
+
+_LOGO_HTML = """
+<div class="dv-logo">
+  <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="dvg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8B5CF6"/><stop offset="1" stop-color="#EC4899"/>
+    </linearGradient></defs>
+    <rect x="2" y="2" width="44" height="44" rx="13" fill="url(#dvg)"/>
+    <rect x="12" y="25" width="5.5" height="10" rx="2" fill="#fff"/>
+    <rect x="21.25" y="19" width="5.5" height="16" rx="2" fill="#fff"/>
+    <rect x="30.5" y="13" width="5.5" height="22" rx="2" fill="#fff"/>
+    <path d="M14.75 22 L24 16 L33.25 10.5" stroke="#fff" stroke-width="2"
+          fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <circle cx="14.75" cy="22" r="2.4" fill="#fff"/>
+    <circle cx="24" cy="16" r="2.4" fill="#fff"/>
+    <circle cx="33.25" cy="10.5" r="2.4" fill="#fff"/>
+  </svg>
+  <span class="dv-logo-text">Datavisor</span>
+</div>
+"""
+
+
+def sidebar_logo() -> None:
+    """Собственный логотип вверху боковой панели (полный контроль вёрстки)."""
+    with st.sidebar:
+        st.markdown(_LOGO_HTML, unsafe_allow_html=True)
 
 
 def app_header() -> None:
