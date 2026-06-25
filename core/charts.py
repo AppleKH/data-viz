@@ -212,7 +212,12 @@ def _tight_x(fig, plot_df, x) -> None:
         pass
     fig.update_xaxes(tickmode="array", tickvals=xs)
     if len(xs) >= 2:
-        fig.update_xaxes(range=[xs[0], xs[-1]])
+        # Небольшой отступ по краям, чтобы крайние точки/подписи не обрезались.
+        try:
+            pad = (xs[-1] - xs[0]) * 0.05
+            fig.update_xaxes(range=[xs[0] - pad, xs[-1] + pad])
+        except TypeError:  # нечисловой/категориальный X — авто-диапазон
+            pass
 
 
 def _rgba(color: str, alpha: float) -> str:
@@ -224,13 +229,27 @@ def _rgba(color: str, alpha: float) -> str:
     return color or f"rgba(139,92,246,{alpha})"
 
 
+def _fmt(v) -> str:
+    """Человекочитаемое число для подписи точки."""
+    try:
+        f = float(v)
+    except (TypeError, ValueError):
+        return ""
+    if f == int(f):
+        return f"{int(f):,}".replace(",", " ")
+    return f"{f:,.1f}".replace(",", " ")
+
+
 def _smooth_fill(fig) -> None:
-    """Сглаживание (spline) + полупрозрачная заливка под линией — как на референсе."""
+    """Сглаживание (spline) + заливка + точки с подписями значений."""
     for tr in fig.data:
         base = tr.line.color or COLORWAY[0]
-        tr.update(line_shape="spline", line_width=2.6, mode="lines+markers",
+        yvals = list(tr.y) if tr.y is not None else []
+        tr.update(line_shape="spline", line_width=2.6, mode="lines+markers+text",
                   marker=dict(size=8, color=base,
                               line=dict(width=1.6, color="#17131F")),
+                  text=[_fmt(v) for v in yvals], textposition="top center",
+                  textfont=dict(color="#E7E4F0", size=11),
                   fill="tozeroy", fillcolor=_rgba(base, 0.16))
 
 
