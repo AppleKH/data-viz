@@ -1,18 +1,23 @@
-"""АС «Представление данных» — платформа визуализации данных на Streamlit.
+"""Datavisor — платформа визуализации данных на Streamlit.
 
-Точка входа: задаёт оформление и сгруппированную навигацию (как в референсной
-системе: «Источники данных», «Обработка», группа «Панели» → Виджеты, Дашборды).
+Точка входа: логотип, оформление и сгруппированная навигация
+(«Источники данных», «Обработка», группа «Панели» → Виджеты, Дашборды).
 
 Запуск:  python -m streamlit run app.py
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import streamlit as st
 
 from core import storage, ui
 
-st.set_page_config(page_title="Представление данных", page_icon="📊",
-                   layout="wide")
+_ASSETS = Path(__file__).resolve().parent / "assets"
+
+st.set_page_config(page_title="Datavisor", page_icon="📊", layout="wide")
+st.logo(str(_ASSETS / "logo.svg"), icon_image=str(_ASSETS / "icon.svg"),
+        size="large")
 storage.ensure_dirs()
 ui.inject_css()
 

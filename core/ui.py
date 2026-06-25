@@ -8,7 +8,7 @@ import streamlit as st
 
 from core import charts
 
-APP_NAME = "Представление данных"
+APP_NAME = "Datavisor"
 APP_SUBTITLE = "Аналитическая платформа · визуализация данных"
 PRIMARY = "#8B5CF6"        # фиолетовый акцент
 ACCENT2 = "#C026D3"        # пурпурный (для градиента шапки)
