@@ -140,9 +140,14 @@ def build_figure(df: pd.DataFrame, cfg: dict):
                           paper_bgcolor="rgba(0,0,0,0)", font_color="#E7E4F0")
         return ("figure", fig)
 
-    plot_df = _aggregate(df, x, ys, color, agg)
-    y = "count" if (agg == "count") else (ys[0] if ys else None)
-    y_multi = ys if (agg != "count" and len(ys) > 1) else y
+    # Для линий/областей без явной агрегации суммируем по X — иначе несколько
+    # значений на одну дату дают «зигзаг» из вертикальных линий.
+    plot_agg = "sum" if (agg == "none" and chart in ("line", "area")) else agg
+    plot_df = _aggregate(df, x, ys, color, plot_agg)
+    if x and x in plot_df.columns:
+        plot_df = plot_df.sort_values(by=x)  # линия слева направо
+    y = "count" if (plot_agg == "count") else (ys[0] if ys else None)
+    y_multi = ys if (plot_agg != "count" and len(ys) > 1) else y
 
     common = dict(title=title, template=template,
                   color_discrete_sequence=COLORWAY)
@@ -150,11 +155,13 @@ def build_figure(df: pd.DataFrame, cfg: dict):
         common["color"] = color
 
     if chart == "line":
-        fig = px.line(plot_df, x=x, y=y_multi, markers=True, **common)
+        fig = px.line(plot_df, x=x, y=y_multi, **common)
+        _smooth_fill(fig)
     elif chart == "bar":
         fig = px.bar(plot_df, x=x, y=y_multi, barmode="group", **common)
     elif chart == "area":
         fig = px.area(plot_df, x=x, y=y_multi, **common)
+        fig.update_traces(line_shape="spline")
     elif chart == "scatter":
         fig = px.scatter(plot_df, x=x, y=y, **common)
     elif chart == "pie":
@@ -184,6 +191,23 @@ def _style(fig, cfg: dict) -> None:
     )
     fig.update_xaxes(gridcolor="rgba(139,92,246,.15)", zerolinecolor="rgba(139,92,246,.25)")
     fig.update_yaxes(gridcolor="rgba(139,92,246,.15)", zerolinecolor="rgba(139,92,246,.25)")
+
+
+def _rgba(color: str, alpha: float) -> str:
+    """HEX (#RRGGBB) -> rgba(...) с заданной прозрачностью."""
+    c = (color or "").lstrip("#")
+    if len(c) == 6:
+        r, g, b = (int(c[i:i + 2], 16) for i in (0, 2, 4))
+        return f"rgba({r},{g},{b},{alpha})"
+    return color or f"rgba(139,92,246,{alpha})"
+
+
+def _smooth_fill(fig) -> None:
+    """Сглаживание (spline) + полупрозрачная заливка под линией — как на референсе."""
+    for tr in fig.data:
+        base = tr.line.color or COLORWAY[0]
+        tr.update(line_shape="spline", line_width=2.6, mode="lines",
+                  fill="tozeroy", fillcolor=_rgba(base, 0.16))
 
 
 def current_datetime() -> str:
