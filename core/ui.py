@@ -178,4 +178,6 @@ def render_widget(cfg: dict, df=None, *, key: str) -> None:
     elif kind == "datetime":
         st.metric(cfg.get("title") or "Дата/время", charts.current_datetime())
     else:
-        st.plotly_chart(payload, width="stretch", key=f"chart_{key}")
+        # Без зума: скрываем панель инструментов и отключаем зум колесом.
+        st.plotly_chart(payload, width="stretch", key=f"chart_{key}",
+                        config={"displayModeBar": False, "scrollZoom": False})

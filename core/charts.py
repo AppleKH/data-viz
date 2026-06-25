@@ -174,12 +174,14 @@ def build_figure(df: pd.DataFrame, cfg: dict):
     else:
         fig = go.Figure()
 
+    if chart in ("line", "area", "scatter"):
+        _tight_x(fig, plot_df, x)
     _style(fig, cfg)
     return ("figure", fig)
 
 
 def _style(fig, cfg: dict) -> None:
-    """Единое оформление: прозрачный фон (под фиолетовые карточки), палитра."""
+    """Единое оформление: прозрачный фон, палитра, без зума (fixedrange)."""
     fig.update_layout(
         margin=dict(l=10, r=10, t=40, b=10),
         height=cfg.get("height", 350),
@@ -188,9 +190,29 @@ def _style(fig, cfg: dict) -> None:
         colorway=COLORWAY,
         font_color="#E7E4F0",
         legend_font_color="#E7E4F0",
+        dragmode=False,  # отключаем выделение/зум мышью
     )
-    fig.update_xaxes(gridcolor="rgba(139,92,246,.15)", zerolinecolor="rgba(139,92,246,.25)")
-    fig.update_yaxes(gridcolor="rgba(139,92,246,.15)", zerolinecolor="rgba(139,92,246,.25)")
+    # fixedrange => ось нельзя зумить/тянуть
+    fig.update_xaxes(gridcolor="rgba(139,92,246,.15)",
+                     zerolinecolor="rgba(139,92,246,.25)", fixedrange=True)
+    fig.update_yaxes(gridcolor="rgba(139,92,246,.15)",
+                     zerolinecolor="rgba(139,92,246,.25)", fixedrange=True)
+
+
+def _tight_x(fig, plot_df, x) -> None:
+    """Ось X строго по данным: метки только на реальных точках, без пустого места."""
+    if not x or x not in plot_df.columns:
+        return
+    xs = list(pd.unique(plot_df[x].dropna()))
+    if not xs:
+        return
+    try:
+        xs = sorted(xs)
+    except TypeError:
+        pass
+    fig.update_xaxes(tickmode="array", tickvals=xs)
+    if len(xs) >= 2:
+        fig.update_xaxes(range=[xs[0], xs[-1]])
 
 
 def _rgba(color: str, alpha: float) -> str:
