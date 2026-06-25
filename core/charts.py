@@ -41,6 +41,12 @@ THEMES = {
     "Чёрно-белая": "none",
 }
 
+# Фирменная фиолетово-розовая палитра для виджетов (в стиле референса).
+COLORWAY = ["#8B5CF6", "#EC4899", "#A855F7", "#F472B6", "#C026D3",
+            "#7C3AED", "#D946EF", "#6366F1", "#E879F9", "#9333EA"]
+# Непрерывная шкала (для числовой раскраски) — фиолетовый → розовый.
+COLOR_SCALE = ["#6D28D9", "#8B5CF6", "#C026D3", "#EC4899", "#F9A8D4"]
+
 AGGS = {
     "none": "без агрегации",
     "sum": "сумма",
@@ -119,24 +125,27 @@ def build_figure(df: pd.DataFrame, cfg: dict):
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
             value=float(value),
-            number={"suffix": cfg.get("gauge_suffix", "")},
+            number={"suffix": cfg.get("gauge_suffix", ""), "font": {"color": "#E7E4F0"}},
             title={"text": title},
             gauge={
                 "axis": {"range": [0, gmax]},
-                "bar": {"color": "#2E6CB5"},
-                "threshold": {"line": {"color": "#D64545", "width": 3},
+                "bar": {"color": "#8B5CF6"},
+                "bordercolor": "rgba(139,92,246,.25)",
+                "threshold": {"line": {"color": "#EC4899", "width": 3},
                               "value": float(cfg.get("gauge_target") or gmax)},
             },
         ))
         fig.update_layout(template=template, height=cfg.get("height", 300),
-                          margin=dict(l=20, r=20, t=50, b=10))
+                          margin=dict(l=20, r=20, t=50, b=10),
+                          paper_bgcolor="rgba(0,0,0,0)", font_color="#E7E4F0")
         return ("figure", fig)
 
     plot_df = _aggregate(df, x, ys, color, agg)
     y = "count" if (agg == "count") else (ys[0] if ys else None)
     y_multi = ys if (agg != "count" and len(ys) > 1) else y
 
-    common = dict(title=title, template=template)
+    common = dict(title=title, template=template,
+                  color_discrete_sequence=COLORWAY)
     if color:
         common["color"] = color
 
@@ -149,7 +158,8 @@ def build_figure(df: pd.DataFrame, cfg: dict):
     elif chart == "scatter":
         fig = px.scatter(plot_df, x=x, y=y, **common)
     elif chart == "pie":
-        fig = px.pie(plot_df, names=x, values=y, title=title, template=template)
+        fig = px.pie(plot_df, names=x, values=y, title=title, template=template,
+                     color_discrete_sequence=COLORWAY)
     elif chart == "histogram":
         fig = px.histogram(plot_df, x=x or y, **common)
     elif chart == "box":
@@ -157,9 +167,23 @@ def build_figure(df: pd.DataFrame, cfg: dict):
     else:
         fig = go.Figure()
 
-    fig.update_layout(margin=dict(l=10, r=10, t=40, b=10),
-                      height=cfg.get("height", 350))
+    _style(fig, cfg)
     return ("figure", fig)
+
+
+def _style(fig, cfg: dict) -> None:
+    """Единое оформление: прозрачный фон (под фиолетовые карточки), палитра."""
+    fig.update_layout(
+        margin=dict(l=10, r=10, t=40, b=10),
+        height=cfg.get("height", 350),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        colorway=COLORWAY,
+        font_color="#E7E4F0",
+        legend_font_color="#E7E4F0",
+    )
+    fig.update_xaxes(gridcolor="rgba(139,92,246,.15)", zerolinecolor="rgba(139,92,246,.25)")
+    fig.update_yaxes(gridcolor="rgba(139,92,246,.15)", zerolinecolor="rgba(139,92,246,.25)")
 
 
 def current_datetime() -> str:
