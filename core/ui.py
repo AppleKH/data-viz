@@ -66,13 +66,40 @@ _BASE_CSS = f"""
 [data-testid="stSidebarContent"] {{
     display: flex !important;
     flex-direction: column !important;
+    gap: 0 !important;
 }}
-[data-testid="stSidebarUserContent"] {{ order: -1 !important; }}
+[data-testid="stSidebarUserContent"] {{
+    order: -1 !important; margin: 0 !important; padding: 0 !important;
+    flex: 0 0 auto !important; height: fit-content !important;
+    min-height: 0 !important; align-self: flex-start !important;
+}}
+[data-testid="stSidebarUserContent"] > div,
+[data-testid="stSidebarUserContent"] [data-testid="stVerticalBlock"],
+[data-testid="stSidebarUserContent"] [data-testid="stVerticalBlockBorderWrapper"],
+[data-testid="stSidebarUserContent"] [data-testid="stElementContainer"] {{
+    flex: 0 0 auto !important; min-height: 0 !important;
+    padding: 0 !important; gap: 0 !important;
+}}
+/* Схлопываем пустую «шапку» сайдбара в ноль (она и создавала пробел) */
+[data-testid="stSidebarHeader"] {{
+    min-height: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+}}
+/* Кнопку сворачивания делаем плавающей в правом верхнем углу панели */
+section[data-testid="stSidebar"] {{ position: relative !important; }}
+[data-testid="stSidebarCollapseButton"] {{
+    position: absolute !important;
+    top: 8px !important; right: 8px !important; z-index: 100 !important;
+}}
+[data-testid="stSidebarNav"] {{ margin-top: 0 !important; padding-top: 0 !important; }}
 
 /* Собственный логотип вверху боковой панели */
 .dv-logo {{
     display: flex; align-items: center; gap: 11px;
-    padding: 14px 6px 6px 6px;
+    padding: 12px 6px 38px 6px;
 }}
 .dv-logo svg {{ width: 36px; height: 36px; flex: none; }}
 .dv-logo-text {{
@@ -101,7 +128,7 @@ section[data-testid="stSidebar"][aria-expanded="false"] > div {{
 /* Свёрнутый вид: у логотипа прячем текст, иконку центрируем в полосе */
 section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo {{
     justify-content: center !important;
-    padding: 14px 0 8px 0 !important;
+    padding: 14px 0 28px 0 !important;
 }}
 section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo-text {{
     display: none !important;
@@ -140,6 +167,7 @@ section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarN
 section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNavLink"] [data-testid="stIconMaterial"] {{
     font-size: 22px !important;
 }}
+
 </style>
 """
 
