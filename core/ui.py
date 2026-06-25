@@ -44,6 +44,48 @@ _BASE_CSS = f"""
 .stButton button[kind="primary"] {{
     background: var(--primary); border:0; font-weight:600;
 }}
+
+/* === Свёрнутая боковая панель: узкая полоса с иконками разделов === */
+section[data-testid="stSidebar"][aria-expanded="false"] {{
+    transform: none !important;
+    width: 3.5rem !important;
+    min-width: 3.5rem !important;
+    max-width: 3.5rem !important;
+    margin-left: 0 !important;
+    visibility: visible !important;
+}}
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarContent"],
+section[data-testid="stSidebar"][aria-expanded="false"] > div {{
+    overflow: visible !important;
+}}
+/* Прячем подписи ссылок и заголовки групп — оставляем только иконки */
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNavLink"] > span:last-child,
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNav"] header,
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarUserContent"] {{
+    display: none !important;
+}}
+/* Заголовки групп (Навигация/Данные/Панели) — пункты списка без ссылки */
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNav"] li:not(:has(a)) {{
+    display: none !important;
+}}
+/* Обнуляем ВСЕ вертикальные отступы внутри навигации (между группами тоже) */
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNav"] * {{
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}}
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNav"] ul {{
+    padding: 0 !important;
+    gap: 0 !important;
+}}
+/* Каждая иконка-ссылка — одинаковой высоты => равномерный шаг */
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNavLink"] {{
+    justify-content: center !important;
+    padding: 9px 0 !important;
+    margin: 0 !important;
+}}
+section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarNavLink"] [data-testid="stIconMaterial"] {{
+    font-size: 22px !important;
+}}
 </style>
 """
 
