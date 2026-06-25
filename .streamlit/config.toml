@@ -1,6 +1,13 @@
-# Тема НЕ задаётся специально — тогда Streamlit показывает в меню
-# «⋮» → Settings родной переключатель Light / Dark / Use system setting,
-# который корректно красит все элементы (включая таблицы).
-# Графики следуют активной теме автоматически (core/ui.active_template).
+# Фиксированная тёмно-фиолетовая тема (в стиле референса CRAVEAT).
+# Цвета применяются нативно Streamlit — согласованно во всех элементах,
+# включая таблицы, поля ввода и графики.
+[theme]
+base = "dark"
+backgroundColor = "#17131F"
+secondaryBackgroundColor = "#221C33"
+textColor = "#E7E4F0"
+primaryColor = "#8B5CF6"
+font = "sans serif"
+
 [server]
 headless = true
