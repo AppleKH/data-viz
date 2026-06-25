@@ -10,7 +10,8 @@ from core import charts
 
 APP_NAME = "Представление данных"
 APP_SUBTITLE = "Аналитическая платформа · визуализация данных"
-PRIMARY = "#4D9BE0"
+PRIMARY = "#8B5CF6"        # фиолетовый акцент
+ACCENT2 = "#EC4899"        # розовый (для градиентов)
 
 _BASE_CSS = f"""
 <style>
@@ -18,12 +19,12 @@ _BASE_CSS = f"""
 
 /* Шапка приложения */
 .app-header {{
-    background: linear-gradient(90deg, #2E6CB5 0%, #244e88 100%);
+    background: linear-gradient(90deg, {PRIMARY} 0%, {ACCENT2} 100%);
     color: #fff;
     padding: 14px 22px;
     border-radius: 10px;
     margin-bottom: 8px;
-    box-shadow: 0 2px 8px rgba(36,78,136,.18);
+    box-shadow: 0 4px 14px rgba(139,92,246,.30);
 }}
 .app-header .title {{ font-size: 20px; font-weight: 700; letter-spacing:.2px; }}
 .app-header .subtitle {{ font-size: 12.5px; opacity:.85; margin-top:2px; }}
@@ -40,10 +41,29 @@ _BASE_CSS = f"""
 .badge-common {{ background:#E3F0FF; color:#1c5aa8; }}
 .badge-private {{ background:#FCE8E6; color:#b3261e; }}
 
-[data-testid="stVerticalBlockBorderWrapper"] {{ border-radius:10px; }}
+[data-testid="stVerticalBlockBorderWrapper"] {{
+    border-radius:10px;
+    border-color: rgba(139,92,246,.30);
+}}
 .stButton button[kind="primary"] {{
     background: var(--primary); border:0; font-weight:600;
 }}
+.stButton button[kind="primary"]:hover {{ background:{ACCENT2}; }}
+
+/* Значения метрик (KPI) — фиолетовым акцентом, как на референсе */
+[data-testid="stMetricValue"] {{ color: var(--primary) !important; }}
+
+/* Активный пункт навигации — сиреневая «пилюля» */
+[data-testid="stSidebarNav"] a[aria-current="page"] {{
+    background: rgba(139,92,246,.20) !important;
+    border-radius: 8px !important;
+}}
+[data-testid="stSidebarNav"] a[aria-current="page"] [data-testid="stIconMaterial"] {{
+    color: var(--primary) !important;
+}}
+
+/* Слайдер/ссылки в акцентном цвете */
+a, .stMarkdown a {{ color: var(--primary); }}
 
 /* === Свёрнутая боковая панель: узкая полоса с иконками разделов === */
 section[data-testid="stSidebar"][aria-expanded="false"] {{
@@ -90,15 +110,22 @@ section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarN
 """
 
 
+def is_dark_theme() -> bool:
+    try:
+        return st.context.theme.type == "dark"
+    except Exception:  # noqa: BLE001 — на случай старого Streamlit
+        return True
+
+
 def active_template() -> str:
     """Шаблон Plotly под активную тему Streamlit (светлая/тёмная)."""
-    try:
-        return "plotly_dark" if st.context.theme.type == "dark" else "plotly_white"
-    except Exception:  # noqa: BLE001  — на случай старого Streamlit
-        return "plotly_dark"
+    return "plotly_dark" if is_dark_theme() else "plotly_white"
 
 
 def inject_css() -> None:
+    # Один набор стилей: фиолетово-розовые акценты работают и в светлой,
+    # и в тёмной теме. Фон/текст остаются нативными (Streamlit Light/Dark),
+    # поэтому обе темы выглядят согласованно.
     st.markdown(_BASE_CSS, unsafe_allow_html=True)
 
 
