@@ -10,9 +10,13 @@ import io
 import re
 
 import plotly.graph_objects as go
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from core import charts, storage
+
+FONT = "Arial, Helvetica, sans-serif"
+RADIUS = 22         # скругление углов карточки (px)
+BORDER = (96, 78, 140)  # цвет рамки карточки (фиолетовый)
 
 BG = "#17131F"      # фон холста
 CARD = "#221C33"    # фон карточки виджета
@@ -71,10 +75,27 @@ def _widget_fig(cfg: dict, df) -> go.Figure | None:
 
 def _fig_png(fig: go.Figure) -> Image.Image:
     fig.update_layout(width=CW, height=CH, paper_bgcolor=CARD, plot_bgcolor=CARD,
-                      font_color=FG, margin=dict(l=30, r=20, t=50, b=30),
-                      showlegend=fig.layout.showlegend)
+                      font=dict(color=FG, family=FONT),
+                      title_font=dict(color=FG, family=FONT, size=18),
+                      margin=dict(l=30, r=20, t=50, b=30))
+    # Сетка — едва заметная (как в приложении), без жирных линий.
+    fig.update_xaxes(gridcolor="rgba(139,92,246,.08)", zerolinecolor="rgba(139,92,246,.12)")
+    fig.update_yaxes(gridcolor="rgba(139,92,246,.08)", zerolinecolor="rgba(139,92,246,.12)")
     data = fig.to_image(format="png", scale=SCALE)
     return Image.open(io.BytesIO(data)).convert("RGB")
+
+
+def _round_card(img: Image.Image) -> Image.Image:
+    """Скруглённые углы + тонкая фиолетовая рамка (как карточки в приложении)."""
+    r = RADIUS * SCALE
+    w, h = img.size
+    mask = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(mask).rounded_rectangle([0, 0, w - 1, h - 1], radius=r, fill=255)
+    out = Image.new("RGB", (w, h), BG)
+    out.paste(img, (0, 0), mask)
+    ImageDraw.Draw(out).rounded_rectangle(
+        [1, 1, w - 2, h - 2], radius=r, outline=BORDER, width=2)
+    return out
 
 
 def _placeholder(text: str) -> Image.Image:
@@ -135,6 +156,7 @@ def export_png(dashboard: dict, widget_by_id: dict, datasets: dict) -> bytes | N
         img = _widget_image(widget_by_id[wid], datasets)
         if img.size != (cwpx, chpx):
             img = img.resize((cwpx, chpx))
+        img = _round_card(img)
         r, c = divmod(i, ncols)
         x = PAD + c * (cwpx + PAD)
         y = TITLE_H + PAD + r * (chpx + PAD)
