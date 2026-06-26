@@ -99,7 +99,7 @@ section[data-testid="stSidebar"] {{ position: relative !important; }}
 /* Собственный логотип вверху боковой панели */
 .dv-logo {{
     display: flex; align-items: center; gap: 11px;
-    padding: 12px 6px 38px 6px;
+    padding: 22px 6px 38px 6px;
 }}
 .dv-logo svg {{ width: 36px; height: 36px; flex: none; }}
 .dv-logo-text {{
@@ -128,13 +128,16 @@ section[data-testid="stSidebar"][aria-expanded="false"] > div {{
 /* Свёрнутый вид: у логотипа прячем текст, иконку центрируем в полосе */
 section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo {{
     justify-content: center !important;
-    padding: 14px 0 28px 0 !important;
+    align-items: center !important;
+    gap: 0 !important;
+    width: 100% !important;
+    padding: 18px 0 26px 6px !important;   /* сдвиг вправо, чтобы лого совпало с иконками */
 }}
 section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo-text {{
     display: none !important;
 }}
 section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo svg {{
-    width: 28px !important; height: 28px !important;
+    width: 26px !important; height: 26px !important; margin: 0 auto !important;
 }}
 /* Убираем стрелку «свернуть» под лого в свёрнутой панели */
 section[data-testid="stSidebar"][aria-expanded="false"] [data-testid="stSidebarCollapseButton"] {{
