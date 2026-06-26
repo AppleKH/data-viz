@@ -6,7 +6,6 @@ import streamlit as st
 from core import storage, ui
 from core import transforms as tf
 
-ui.app_header()
 ui.breadcrumb("Главная", "Обработка данных")
 storage.ensure_dirs()
 

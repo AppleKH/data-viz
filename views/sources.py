@@ -6,7 +6,6 @@ import streamlit as st
 from core import data_sources as ds
 from core import storage, ui
 
-ui.app_header()
 ui.breadcrumb("Главная", "Источники данных")
 storage.ensure_dirs()
 

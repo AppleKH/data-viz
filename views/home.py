@@ -5,7 +5,6 @@ import streamlit as st
 
 from core import storage, ui
 
-ui.app_header()
 ui.breadcrumb("Главная")
 storage.ensure_dirs()
 

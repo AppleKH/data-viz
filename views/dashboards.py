@@ -5,7 +5,6 @@ import streamlit as st
 
 from core import charts, storage, ui
 
-ui.app_header()
 ui.breadcrumb("Главная", "Панели", "Дашборды")
 storage.ensure_dirs()
 
