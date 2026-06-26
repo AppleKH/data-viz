@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from core import charts, storage, ui
+from core import charts, export, storage, ui
 
 ui.breadcrumb("Главная", "Панели", "Дашборды")
 storage.ensure_dirs()
@@ -89,3 +89,19 @@ with tab_view:
                 with grid[i % ncols]:
                     with st.container(border=True):
                         render_on_dashboard(widget_by_id[wid])
+
+            st.divider()
+            if st.button("🖼️ Сформировать PNG", key="make_png"):
+                with st.spinner("Рендеринг дашборда…"):
+                    try:
+                        png = export.export_png(dash, widget_by_id, datasets)
+                        st.session_state["dash_png"] = png
+                        st.session_state["dash_png_name"] = dash["name"]
+                    except Exception as e:  # noqa: BLE001
+                        st.session_state["dash_png"] = None
+                        st.error(f"Не удалось сформировать PNG: {e}")
+            if st.session_state.get("dash_png"):
+                st.download_button(
+                    "⬇️ Скачать PNG", st.session_state["dash_png"],
+                    file_name=f"{st.session_state.get('dash_png_name', 'dashboard')}.png",
+                    mime="image/png", key="dl_png")
