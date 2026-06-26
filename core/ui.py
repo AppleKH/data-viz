@@ -71,7 +71,7 @@ _BASE_CSS = f"""
 [data-testid="stSidebarUserContent"] {{
     order: -1 !important; margin: 0 !important; padding: 0 !important;
     flex: 0 0 auto !important; height: fit-content !important;
-    min-height: 0 !important; align-self: flex-start !important;
+    min-height: 0 !important; align-self: stretch !important; width: 100% !important;
 }}
 [data-testid="stSidebarUserContent"] > div,
 [data-testid="stSidebarUserContent"] [data-testid="stVerticalBlock"],
@@ -99,9 +99,15 @@ section[data-testid="stSidebar"] {{ position: relative !important; }}
 /* Собственный логотип вверху боковой панели */
 .dv-logo {{
     display: flex; align-items: center; gap: 11px;
-    padding: 22px 6px 38px 6px;
+    padding: 22px 6px 22px 6px;
 }}
 .dv-logo svg {{ width: 36px; height: 36px; flex: none; }}
+/* Разделительная линия между логотипом и меню (как под иконками) */
+.dv-sep {{
+    height: 1px;
+    background: rgba(250,250,250,.13);
+    margin: 0 0 30px 0;
+}}
 .dv-logo-text {{
     font-size: 22px; font-weight: 700; letter-spacing: .3px;
     background: linear-gradient(90deg, #C4B5FD, #F9A8D4);
@@ -131,7 +137,7 @@ section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo {{
     align-items: center !important;
     gap: 0 !important;
     width: 100% !important;
-    padding: 18px 0 26px 6px !important;   /* сдвиг вправо, чтобы лого совпало с иконками */
+    padding: 18px 0 18px 0 !important;
 }}
 section[data-testid="stSidebar"][aria-expanded="false"] .dv-logo-text {{
     display: none !important;
@@ -211,6 +217,7 @@ _LOGO_HTML = """
   </svg>
   <span class="dv-logo-text">Datavisor</span>
 </div>
+<div class="dv-sep"></div>
 """
 
 
