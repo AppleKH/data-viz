@@ -92,7 +92,7 @@ _BASE_CSS = f"""
 section[data-testid="stSidebar"] {{ position: relative !important; }}
 [data-testid="stSidebarCollapseButton"] {{
     position: absolute !important;
-    top: 8px !important; right: 8px !important; z-index: 100 !important;
+    top: 28px !important; right: 8px !important; z-index: 100 !important;
 }}
 [data-testid="stSidebarNav"] {{ margin-top: 0 !important; padding-top: 0 !important; }}
 
